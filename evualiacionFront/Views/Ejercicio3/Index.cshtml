@@ -1,0 +1,180 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+@section Style{
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.29.2/sweetalert2.all.js"></script>
+}
+<section class="card" style="width:70%; margin-left:auto; margin-right:auto;">
+    <header class="card-header">
+        <div class="card-actions">
+        </div>
+
+        <h2 class="card-title">Ahorcado</h2>
+    </header>
+    <div class="card-body">
+        <form class="form-horizontal form-bordered" asp-action="Create" method="post">
+            <div class="form-group row center">
+                <div class="col-sm-8">
+                    @*<input readonly id="palabra" />*@
+                    <input readonly id="aciertos" hidden type="number" value="0" />
+                    <div class="form-group row">
+                        <label class="col-lg-3 control-label text-lg-right pt-2">Ingrese Letra </label>
+                        <div class="col-lg-6">
+                            <input class="form-control" id="txtLetra" onkeyup="verificarLetra()" required />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 control-label text-lg-right pt-2">Intentos restantes </label>
+                        <div class="col-lg-6">
+                            <input class="form-control" id="txtRestantes" readonly type="number" value="6" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 control-label text-lg-right pt-2"> </label>
+                        <div class="col-lg-6">
+                            <div id="container">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row" hidden id="containerR">
+                        <label class="col-lg-3 control-label text-lg-right pt-2">Respuesta correcta </label>
+                        <div class="col-lg-6">
+                            <input readonly class="form-control" id="palabra" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 control-label text-lg-right pt-2">Caracteres Utilizados </label>
+                        <div class="col-lg-6">
+                            <input class="form-control" id="txtUtilizados" readonly type="text" multiple value="" />
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-lg-3 control-label text-lg-right pt-2"> </label>
+                        <div class="col-lg-6">
+                            <button type="button" class="btn btn-danger" onclick="cargarNuevo()">Jugar de nuevo</button>
+                        </div>
+                    </div>
+                </div>
+                    <div class="col-sm-4">
+                        <img id="imgH" src="~/img/0.png" />
+                    </div>
+                </div>
+        </form>
+
+
+    </div>
+</section>
+
+@section Scripts{
+    <script>
+        function cargarNuevo() {
+            document.getElementById('imgH').src = `https://\localhost:44375/img/0.png`;
+            $("#txtLetra").removeAttr("readonly", "readonly");
+            document.getElementById('txtRestantes').value = 6;
+            document.getElementById('aciertos').value = 0;
+            document.getElementById('txtUtilizados').value = "";
+            getPalabra();
+        }
+        function verificarLetra() {
+            var letra = document.getElementById('txtLetra');
+            var palabraInput = document.getElementById('palabra').value;
+            var letraValue = (letra.value).toUpperCase();
+            var inputUtilizados = document.getElementById('txtUtilizados');
+            var ArrayUtilizados = (inputUtilizados.value).split("");
+            var myArr = palabraInput.split("");
+
+            var isUtilizada = ArrayUtilizados.includes(letraValue);
+
+            if (!isUtilizada) {
+                inputUtilizados.value = inputUtilizados.value + ' ' + letraValue;
+                var letraCorrecta = myArr.includes(letraValue);
+                if (letraCorrecta) {
+                    var inputAcierto = document.getElementById('aciertos');
+                    var totalAciertos = parseInt(inputAcierto.value) + 1;
+                    inputAcierto.value = totalAciertos;
+                    if (totalAciertos == myArr.length) {
+                        swal({
+                            title: `Palabra acertada`,
+                            type: 'success',
+                            showCancelButton: false,
+                            confirmButtonText: 'Ok',
+                        }).then((result) => {
+                            if (result.value) {
+
+                            }
+                        });
+                        $("#txtLetra").attr("readonly", "readonly");
+                    }
+                    $.each(myArr, function (i, item) {
+                        if (item == letraValue) {
+                            var labelLetra = document.getElementById(`p${i}`);
+                            labelLetra.innerHTML = letraValue;
+                        }
+                    });
+                } else {
+
+                    var inputRestantes = document.getElementById('txtRestantes');
+
+                    if (parseInt((inputRestantes.value)) != 0) {
+                        var restantes = parseInt((inputRestantes.value)) - 1;
+                        if (restantes == 0) {
+                            $("#txtLetra").attr("readonly", "readonly");
+                            $("#containerR").removeAttr("hidden", "hidden");
+                            swal({
+                                title: `Has perdido`,
+                                type: 'error',
+                                showCancelButton: false,
+                                confirmButtonText: 'Ok',
+                            }).then((result) => {
+                                if (result.value) {
+
+                                }
+                            });
+                        }
+                        var errores = 6 - restantes;
+
+                        document.getElementById('imgH').src = `https://\localhost:44375/img/${errores}.png`
+                        inputRestantes.value = restantes;
+                    }
+
+                }
+            }
+
+
+
+            letra.value = '';
+        }
+        function getPalabra() {
+            var url = '/Ejercicio3/GetPalabra/';
+            var palabraInput = document.getElementById('palabra');
+            $("#containerR").attr("hidden", "hidden");
+            var contaier = document.getElementById('container');
+            var dataPalabra = "";
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    palabraInput.value = data.palabra1;
+                    var myArr = data.palabra1.split("");
+
+                    $.each(myArr, function (i, item) {
+                        dataPalabra = dataPalabra + `<label id='p${i}' class='control-label ml-2'>__</label>`;
+                    });
+
+                    contaier.innerHTML = dataPalabra;
+                }
+            });
+        }
+        $(document).ready(function () {
+            getPalabra();
+        });
+    </script>
+}
+

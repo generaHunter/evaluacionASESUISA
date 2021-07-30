@@ -1,0 +1,75 @@
+﻿@model evualiacionFront.ViewModels.Ejercicio2ViewModel
+@{
+    ViewData["Title"] = "Index";
+}
+
+@section Style{
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.29.2/sweetalert2.all.js"></script>
+}
+<section class="card" style="width:70%; margin-left:auto; margin-right:auto;">
+    <header class="card-header">
+        <div class="card-actions">
+        </div>
+
+        <h2 class="card-title">Pidra, Papel o Tijera</h2>
+    </header>
+    <div class="card-body">
+        <form class="form-horizontal form-bordered" asp-action="Create" method="post">
+            <div class="form-group row center">
+                <div class="col-sm-12">
+                    <input value="Piedra" type="button" onclick="comprobar('Piedra')" class="btn btn-primary" />
+                    <input value="Papel" type="button" onclick="comprobar('Papel')" class="btn btn-secondary" />
+                    <input value="Tijera" type="button" onclick="comprobar('Tijera')" class="btn btn-danger" />
+                </div>
+            </div>
+        </form>
+
+
+    </div>
+</section>
+@section Scripts{
+    <script>
+        function comprobar(opcionU) {
+        //    var numerosV = document.getElementById('txtNumeros').value;
+
+        var data = {
+            opcion: opcionU
+        }
+                    var Url = "@Url.Action("comprobarHandler", "Ejercicio2")";
+
+            $.post(Url, data).done(function (data) {
+
+
+                console.log(data);
+                if (data.ok) {
+                    swal({
+                        title: ` ${data.mensaje}`,
+                        type: 'warning',
+                        showCancelButton: false,
+                        confirmButtonText: 'Ok',
+                        cancelButtonText: 'No',
+                    }).then((result) => {
+                        if (result.value) {
+
+                        }
+                    });
+                }else {
+                    swal({
+                        title: `Error`,
+                        type: 'warning',
+                        showCancelButton: false,
+                        confirmButtonText: 'Ok',
+                        cancelButtonText: 'No',
+                    }).then((result) => {
+                        if (result.value) {
+
+                        }
+                    });
+                }
+
+            });
+    }
+    </script>
+}
+

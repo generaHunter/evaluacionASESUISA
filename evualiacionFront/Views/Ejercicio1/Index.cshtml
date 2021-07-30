@@ -1,0 +1,82 @@
+﻿@model evualiacionFront.ViewModels.Ejericio1ViewModel
+@{
+    ViewData["Title"] = "Index";
+}
+@section Style{
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.29.2/sweetalert2.all.js"></script>
+}
+<section class="card" style="width:70%; margin-left:auto; margin-right:auto;">
+    <header class="card-header">
+        <div class="card-actions">
+        </div>
+
+        <h2 class="card-title">Suma de numeros enteros</h2>
+    </header>
+    <div class="card-body">
+        <form class="form-horizontal form-bordered" asp-action="Create" method="post">
+            <div class="form-group row">
+                <label class="col-lg-3 control-label text-lg-right pt-2">Numeros</label>
+                <div class="col-lg-6">
+                    <input class="form-control" id="txtNumeros" required />
+                </div>
+            </div>
+            <div class="form-group row center">
+                <label class="col-lg-3 control-label text-lg-right pt-2"> </label>
+                <div class="col-lg-6">
+                    <input value="Sumar" type="button" onclick="sumar()" class="btn btn-primary" />
+                    @*<a asp-action="Index" class="btn btn-default">Back to List</a>*@
+                </div>
+            </div>
+        </form>
+
+
+    </div>
+</section>
+@section Scripts{
+    <script>
+        function sumar() {
+            var numerosV = document.getElementById('txtNumeros').value;
+
+        var data = {
+            numeros: numerosV,
+            id: 1
+        }
+                    var Url = "@Url.Action("SumHandler", "Ejercicio1")";
+
+            $.post(Url, data).done(function (data) {
+
+
+                console.log(data);
+                if (data.sum != -1) {
+                    swal({
+                        title: `El resultado de la suma es: ${data.sum}`,
+                        type: 'warning',
+                        showCancelButton: false,
+                        confirmButtonText: 'Ok',
+                        cancelButtonText: 'No',
+                    }).then((result) => {
+                        if (result.value) {
+
+                        }
+                    });
+                }else {
+                    swal({
+                        title: `Error: ${data.mensaje}`,
+                        type: 'warning',
+                        showCancelButton: false,
+                        confirmButtonText: 'Ok',
+                        cancelButtonText: 'No',
+                    }).then((result) => {
+                        if (result.value) {
+
+                        }
+                    });
+                }
+
+            });
+    }
+    </script>
+}
+
+
